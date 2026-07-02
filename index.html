@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#160d2b" />
+  <meta name="description" content="نظام إذن الانصراف الجماعي لمقيمي الجراحة العامة" />
+  <title>إذن الانصراف | الجراحة العامة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="auth-pending">
+  <div id="login-overlay" class="login-overlay" role="dialog" aria-modal="true" aria-labelledby="login-title">
+    <form id="login-form" class="login-card" novalidate>
+      <div class="login-mark" aria-hidden="true">GS</div>
+      <p class="login-kicker">AUH GENERAL SURGERY</p>
+      <h1 id="login-title">دخول النظام</h1>
+      <p>أدخل رمز الدخول للوصول إلى نظام إذن الانصراف.</p>
+      <label for="login-password" class="field-label">رمز الدخول</label>
+      <input id="login-password" class="login-password" type="password" inputmode="numeric" autocomplete="current-password" pattern="[0-9]*" maxlength="4" placeholder="••••" aria-describedby="login-error" autofocus />
+      <p id="login-error" class="login-error" role="alert"></p>
+      <button class="primary-btn login-btn" type="submit">دخول <span aria-hidden="true">←</span></button>
+      <small>هذا الرمز مخصص للحماية البسيطة لواجهة الموقع.</small>
+    </form>
+  </div>
+
+  <div class="app-shell">
+    <header class="site-header">
+      <a class="brand" href="#home" aria-label="الرئيسية">
+        <span class="brand-mark" aria-hidden="true">GS</span>
+        <span>
+          <strong>الجراحة العامة</strong>
+          <small>AUH GENERAL SURGERY</small>
+        </span>
+      </a>
+      <nav class="top-nav" aria-label="التنقل الرئيسي">
+        <a href="#home" data-nav="home">الرئيسية</a>
+        <a href="#residents" data-nav="residents">المقيمون</a>
+        <a href="#settings" data-nav="settings">الإعدادات</a>
+        <a href="#about" data-nav="about">حول النظام</a>
+      </nav>
+      <button id="logout-btn" class="logout-btn" type="button" title="تسجيل الخروج">خروج</button>
+    </header>
+
+    <main class="page-container">
+      <section class="hero-card" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">نظام المقيمين</p>
+          <h1 id="page-title">إذن الانصراف الجماعي</h1>
+          <p class="hero-copy">اختر المقيمين المناوبين، ثم افتح تطبيق الرسائل مع المستلمين والنص جاهزين.</p>
+        </div>
+        <div class="hero-icon" aria-hidden="true">✉</div>
+      </section>
+
+      <section id="view-home" class="view active" data-view="home">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">الخطوة 1</p>
+            <h2>اختيار المقيمين المناوبين</h2>
+            <p>يمكنك اختيار حتى 6 مقيمين فقط.</p>
+          </div>
+          <div class="selection-indicator" aria-live="polite"><strong id="selected-count">0</strong> / 6 مختارين</div>
+        </div>
+        <div class="notice-bar">
+          <span class="notice-icon">i</span>
+          <span>تظهر هنا بطاقات المقيمين الذين تم تفعيل حالة مناوبتهم داخل ملف <code>residents.js</code>.</span>
+        </div>
+        <div id="on-duty-list" class="residents-grid" aria-live="polite"></div>
+        <div id="no-on-duty" class="empty-state hidden">
+          <span class="empty-icon">☾</span>
+          <h3>لا توجد مناوبات مفعّلة حاليًا</h3>
+          <p>يمكنك تفعيل <code>isOnDuty: true</code> للمقيمين المناوبين من ملف <code>data/residents.js</code>.</p>
+        </div>
+        <div class="home-actions">
+          <button id="continue-btn" class="primary-btn" type="button" disabled>
+            متابعة إلى الرسالة <span aria-hidden="true">←</span>
+          </button>
+          <button id="clear-selection-btn" class="secondary-btn" type="button">إلغاء الاختيار</button>
+        </div>
+      </section>
+
+      <section id="view-message" class="view" data-view="message">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">الخطوة 2</p>
+            <h2>مراجعة وإرسال الرسالة</h2>
+            <p>سيتم فتح تطبيق الرسائل في هاتفك؛ الإرسال النهائي يتم بواسطتك.</p>
+          </div>
+        </div>
+        <div class="message-layout">
+          <article class="panel recipients-panel">
+            <div class="panel-title-row"><h3>المستلمون المختارون</h3><span id="recipient-total" class="soft-badge">0</span></div>
+            <div id="message-recipients" class="recipient-list"></div>
+            <a class="text-link" href="#home">تعديل الاختيار</a>
+          </article>
+          <article class="panel composer-panel">
+            <label for="message-text" class="field-label">نص الرسالة</label>
+            <textarea id="message-text" rows="6" maxlength="480" spellcheck="true"></textarea>
+            <div class="field-meta"><span id="message-count">0 / 480</span><span>يمكنك تعديل النص قبل الإرسال</span></div>
+            <button id="send-sms-btn" class="primary-btn send-btn" type="button">
+              <span aria-hidden="true">✉</span> فتح رسالة SMS جماعية
+            </button>
+            <p class="sms-note">لن تُرسل الرسالة تلقائيًا من الموقع. سيتم فتح تطبيق الرسائل مع الأرقام والنص جاهزين.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-residents" class="view" data-view="residents">
+        <div class="section-heading residents-title-row">
+          <div>
+            <p class="section-kicker">دليل القسم</p>
+            <h2>قائمة المقيمين</h2>
+            <p>قائمة ثابتة مأخوذة من ملف <code>data/residents.js</code>.</p>
+          </div>
+          <div class="filter-wrap">
+            <label class="sr-only" for="resident-search">بحث</label>
+            <input id="resident-search" type="search" placeholder="بحث بالاسم أو الرقم…" />
+          </div>
+        </div>
+        <div id="residents-directory" class="directory-list"></div>
+      </section>
+
+      <section id="view-settings" class="view" data-view="settings">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">تخصيص محلي</p>
+            <h2>الإعدادات</h2>
+            <p>يتم حفظ التفضيلات على هذا الجهاز فقط باستخدام التخزين المحلي للمتصفح.</p>
+          </div>
+        </div>
+        <article class="panel settings-panel">
+          <label for="default-message-text" class="field-label">نص الرسالة الافتراضي</label>
+          <textarea id="default-message-text" rows="6" maxlength="480"></textarea>
+          <div class="settings-actions">
+            <button id="save-default-message-btn" class="primary-btn" type="button">حفظ النص</button>
+            <button id="reset-default-message-btn" class="secondary-btn" type="button">إعادة النص الافتراضي</button>
+          </div>
+          <p class="save-status" id="save-status" role="status"></p>
+        </article>
+        <article class="panel integration-panel">
+          <h3>Firestore — اختياري</h3>
+          <p>هذا المشروع لا يحتاج Firestore ليعمل. حفظ النص محليًا هو الوضع الافتراضي المتوافق 100٪ مع GitHub Pages. يمكن إضافة Firebase لاحقًا فقط عند الحاجة لمزامنة النص بين أجهزة متعددة.</p>
+        </article>
+      </section>
+
+      <section id="view-about" class="view" data-view="about">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">عن النظام</p>
+            <h2>كيف يعمل النظام؟</h2>
+          </div>
+        </div>
+        <div class="about-grid">
+          <article class="panel about-card"><span class="step-number">1</span><h3>اختَر المناوبين</h3><p>من الصفحة الرئيسية اختر حتى ستة مقيمين من البطاقات المتاحة.</p></article>
+          <article class="panel about-card"><span class="step-number">2</span><h3>راجِع الرسالة</h3><p>تظهر قائمة المستلمين والنص الجاهز، ويمكنك تعديله عند الحاجة.</p></article>
+          <article class="panel about-card"><span class="step-number">3</span><h3>أرسل من هاتفك</h3><p>يفتح زر SMS تطبيق الرسائل في هاتفك؛ تتولى أنت الإرسال النهائي للجميع.</p></article>
+        </div>
+        <article class="panel about-full">
+          <h3>مخصص لمن؟</h3>
+          <p>للمقيمين في قسم الجراحة العامة الذين يحتاجون إلى إرسال طلب إذن انصراف لأكثر من مقيم من خلال تطبيق الرسائل على الهاتف، بدون حسابات أو خوادم أو مفاتيح API.</p>
+          <div class="system-meta"><span>الإصدار <strong>1.0.0</strong></span><span>المنصة <strong>GitHub Pages</strong></span><span>البيانات <strong>محلية وثابتة</strong></span></div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">الجراحة العامة <span>•</span> نظام إذن الانصراف <span>•</span> GitHub Pages</footer>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
